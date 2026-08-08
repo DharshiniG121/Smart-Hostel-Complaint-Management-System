@@ -1,0 +1,117 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'My Complaints'; const pageSubtitle = total + ' complaint(s) found'; %>
+
+<div class="app-shell">
+    <%- include('../partials/student-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle }) %>
+        <div class="page-content">
+
+            <!-- Filter Bar -->
+            <form method="GET" action="/student/complaints">
+                <div class="filter-bar">
+                    <input type="text" name="search" id="searchInput" class="form-control search-input"
+                           placeholder="🔍 Search complaints..." value="<%= search %>">
+                    <select name="status" class="form-control" style="max-width:160px;" onchange="this.form.submit()">
+                        <option value="">All Status</option>
+                        <% ['Pending','In Progress','Resolved','Rejected'].forEach(s => { %>
+                        <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= s %></option>
+                        <% }) %>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="/student/complaints" class="btn btn-outline-gray">Reset</a>
+                    <a href="/student/complaints/new" class="btn btn-primary" style="margin-left:auto;">➕ New Complaint</a>
+                </div>
+            </form>
+
+            <div class="card">
+                <% if (complaints.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Complaints Found</h3>
+                    <p>
+                        <% if (search || status) { %>
+                        No complaints match your search criteria. Try adjusting the filters.
+                        <% } else { %>
+                        You haven't submitted any complaints yet.
+                        <% } %>
+                    </p>
+                    <a href="/student/complaints/new" class="btn btn-primary">➕ Submit a Complaint</a>
+                </div>
+                <% } else { %>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-sort>Complaint ID</th>
+                                <th data-sort>Title</th>
+                                <th data-sort>Category</th>
+                                <th data-sort>Priority</th>
+                                <th data-sort>Status</th>
+                                <th data-sort>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% complaints.forEach(c => {
+                                const statusClass = {'Pending':'badge-pending','In Progress':'badge-progress','Resolved':'badge-resolved','Rejected':'badge-rejected'}[c.status] || 'badge-gray';
+                                const prioClass = {'Low':'badge-low','Medium':'badge-medium','High':'badge-high','Critical':'badge-critical'}[c.priority] || 'badge-gray';
+                            %>
+                            <tr>
+                                <td><code style="font-size:0.75rem;color:var(--primary);"><%= c.complaint_id %></code></td>
+                                <td>
+                                    <div style="font-weight:500; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="<%= c.title %>">
+                                        <%= c.title %>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-blue"><%= c.category %></span></td>
+                                <td><span class="badge <%= prioClass %>"><%= c.priority %></span></td>
+                                <td><span class="badge <%= statusClass %>"><%= c.status %></span></td>
+                                <td style="white-space:nowrap; font-size:0.8rem; color:var(--gray);">
+                                    <%= new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="/student/complaints/<%= c.id %>" class="btn btn-outline btn-sm">👁 View</a>
+                                        <% if (c.status === 'Pending') { %>
+                                        <form action="/student/complaints/<%= c.id %>/delete" method="POST"
+                                              class="delete-form" data-confirm="Delete this complaint? This action cannot be undone.">
+                                            <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                                        </form>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                <div class="card-footer">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <div class="page-info">Showing page <%= currentPage %> of <%= totalPages %> (<%= total %> total)</div>
+                        <div class="pagination">
+                            <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage-1 %>&search=<%= search %>&status=<%= status %>" class="page-btn">‹</a>
+                            <% } %>
+                            <% for(let i = Math.max(1,currentPage-2); i <= Math.min(totalPages,currentPage+2); i++) { %>
+                            <a href="?page=<%= i %>&search=<%= search %>&status=<%= status %>"
+                               class="page-btn <%= i===currentPage ? 'active' : '' %>"><%= i %></a>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage+1 %>&search=<%= search %>&status=<%= status %>" class="page-btn">›</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

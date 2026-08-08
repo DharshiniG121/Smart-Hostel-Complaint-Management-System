@@ -1,0 +1,80 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+
+<div class="auth-page">
+    <div class="auth-wrapper">
+        <!-- Left Panel -->
+        <div class="auth-panel">
+            <div class="panel-icon">🏨</div>
+            <h2>Smart Hostel Complaint System</h2>
+            <p>Submit and track your hostel complaints easily. Get real-time updates on the resolution status.</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="fi-icon">📋</div>
+                    <span>Track complaint status in real-time</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">⚡</div>
+                    <span>Fast resolution with priority system</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">📊</div>
+                    <span>View your complaint history & analytics</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">🔔</div>
+                    <span>Instant notifications on updates</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Area -->
+        <div class="auth-form-area">
+            <div class="auth-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <h3>Student Portal</h3>
+                    <span>Hostel Complaint Management</span>
+                </div>
+            </div>
+
+            <h1>Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to manage your hostel complaints</p>
+
+            <form action="/auth/student/login" method="POST" id="loginForm" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="credential">Register Number or Email <span class="required">*</span></label>
+                    <div class="input-group">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="credential" name="credential" class="form-control"
+                               placeholder="Enter register number or email"
+                               value="<%= formData.credential || '' %>" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password <span class="required">*</span></label>
+                    <div class="input-group">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="loginPassword" name="password" class="form-control"
+                               placeholder="Enter your password" required autocomplete="current-password">
+                        <span class="input-icon-right toggle-password" data-target="loginPassword" title="Show password">👁️</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full btn-lg mt-3">
+                    🔑 Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer-link">
+                Don't have an account? <a href="/auth/student/register">Register Now</a>
+            </div>
+            <div class="auth-footer-link" style="margin-top: 8px;">
+                <a href="/auth/admin/login" style="color: var(--gray); font-size: 0.78rem;">Admin Login →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

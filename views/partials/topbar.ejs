@@ -1,0 +1,14 @@
+<header class="topbar">
+    <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+        <div class="topbar-title">
+            <h2><%= typeof pageTitle !== 'undefined' ? pageTitle : title %></h2>
+            <% if (typeof pageSubtitle !== 'undefined') { %>
+            <p><%= pageSubtitle %></p>
+            <% } %>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button class="topbar-btn" title="Home" onclick="window.location.href='<%= typeof isAdmin !== 'undefined' && isAdmin ? '/admin/dashboard' : '/student/dashboard' %>'">🏠</button>
+    </div>
+</header>

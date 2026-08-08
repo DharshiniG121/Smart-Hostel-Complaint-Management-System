@@ -1,0 +1,56 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🏨</div>
+        <div class="brand-text">
+            <h3>Hostel CMS</h3>
+            <span>Student Portal</span>
+        </div>
+    </div>
+
+    <div class="sidebar-user">
+        <div class="user-info">
+            <div class="user-avatar">
+                <%= student.full_name.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+                <div class="user-name"><%= student.full_name %></div>
+                <div class="user-role"><%= student.register_number %></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Main Menu</div>
+        <div class="nav-item">
+            <a href="/student/dashboard" class="nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="/student/complaints/new" class="nav-link <%= currentPath === '/complaints/new' ? 'active' : '' %>">
+                <span class="nav-icon">➕</span> New Complaint
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="/student/complaints" class="nav-link <%= currentPath === '/complaints' || currentPath.startsWith('/complaints/') ? 'active' : '' %>">
+                <span class="nav-icon">📋</span> My Complaints
+            </a>
+        </div>
+
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+            <a href="/student/profile" class="nav-link <%= currentPath === '/profile' ? 'active' : '' %>">
+                <span class="nav-icon">👤</span> My Profile
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <form action="/auth/student/logout" method="POST">
+            <button type="submit" class="logout-btn">
+                <span>🚪</span> Logout
+            </button>
+        </form>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

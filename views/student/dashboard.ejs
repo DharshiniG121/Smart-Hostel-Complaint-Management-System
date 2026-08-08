@@ -1,0 +1,129 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Dashboard'; const pageSubtitle = 'Welcome back, ' + student.full_name; %>
+
+<div class="app-shell">
+    <%- include('../partials/student-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle }) %>
+        <div class="page-content">
+
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <div>
+                    <div class="wc-title">👋 Hello, <%= student.full_name %>!</div>
+                    <div class="wc-subtitle">Here's an overview of your complaints</div>
+                    <div class="wc-meta">
+                        <div class="wc-meta-item">🏛️ <%= student.department %></div>
+                        <div class="wc-meta-item">🏨 <%= student.hostel_block %>, Room <%= student.room_number %></div>
+                        <div class="wc-meta-item">📚 Year <%= student.year_of_study %></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📋</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.total || 0 %></div>
+                        <div class="stat-label">Total Complaints</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.pending || 0 %></div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon cyan">🔄</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.in_progress || 0 %></div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.resolved || 0 %></div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="page-header"><h3>Quick Actions</h3></div>
+            <div class="quick-actions">
+                <a href="/student/complaints/new" class="quick-action-card">
+                    <div class="qa-icon">➕</div>
+                    <div class="qa-label">New Complaint</div>
+                </a>
+                <a href="/student/complaints" class="quick-action-card">
+                    <div class="qa-icon">📋</div>
+                    <div class="qa-label">My Complaints</div>
+                </a>
+                <a href="/student/profile" class="quick-action-card">
+                    <div class="qa-icon">👤</div>
+                    <div class="qa-label">My Profile</div>
+                </a>
+                <a href="/student/complaints?status=Pending" class="quick-action-card">
+                    <div class="qa-icon">⏳</div>
+                    <div class="qa-label">Pending</div>
+                </a>
+            </div>
+
+            <!-- Latest Complaint -->
+            <% if (latestComplaint) { %>
+            <div class="page-header" style="margin-top: 8px;"><h3>Latest Complaint</h3></div>
+            <div class="card">
+                <div class="card-body">
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:0.72rem; color:var(--gray); font-family:monospace; margin-bottom:4px;"><%= latestComplaint.complaint_id %></div>
+                            <div style="font-weight:600; font-size:1rem; color:var(--dark);"><%= latestComplaint.title %></div>
+                            <div style="font-size:0.82rem; color:var(--gray); margin-top:6px;">
+                                📂 <%= latestComplaint.category %> &nbsp;|&nbsp; 
+                                🏨 <%= latestComplaint.hostel_block %>, Room <%= latestComplaint.room_number %>
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--gray); margin-top:4px;">
+                                🕒 <%= new Date(latestComplaint.created_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) %>
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                            <%
+                            const statusClass = {
+                                'Pending': 'badge-pending',
+                                'In Progress': 'badge-progress',
+                                'Resolved': 'badge-resolved',
+                                'Rejected': 'badge-rejected'
+                            }[latestComplaint.status] || 'badge-gray';
+                            const prioClass = {
+                                'Low': 'badge-low', 'Medium': 'badge-medium',
+                                'High': 'badge-high', 'Critical': 'badge-critical'
+                            }[latestComplaint.priority] || 'badge-gray';
+                            %>
+                            <span class="badge <%= statusClass %>"><%= latestComplaint.status %></span>
+                            <span class="badge <%= prioClass %>"><%= latestComplaint.priority %></span>
+                            <a href="/student/complaints/<%= latestComplaint.id %>" class="btn btn-outline btn-sm">View Details →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } else { %>
+            <div class="card" style="margin-top: 8px;">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Complaints Yet</h3>
+                    <p>You haven't submitted any complaints yet. Use the button below to file your first complaint.</p>
+                    <a href="/student/complaints/new" class="btn btn-primary">➕ Submit a Complaint</a>
+                </div>
+            </div>
+            <% } %>
+
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

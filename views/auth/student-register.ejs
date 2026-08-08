@@ -1,0 +1,178 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+
+<style>
+.register-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e293b 0%, #1d4ed8 60%, #0891b2 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 16px;
+}
+.register-card {
+    background: white; border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    width: 100%; max-width: 800px; overflow: hidden;
+}
+.register-header {
+    background: linear-gradient(135deg, var(--primary-dark), #0891b2);
+    padding: 28px 36px; color: white;
+    display: flex; align-items: center; gap: 16px;
+}
+.register-header .rh-icon { font-size: 2.5rem; }
+.register-header h1 { font-size: 1.4rem; }
+.register-header p { opacity: 0.8; font-size: 0.85rem; margin-top: 4px; }
+.register-body { padding: 32px 36px; }
+.section-divider {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--primary);
+    padding-bottom: 8px; margin: 20px 0 16px;
+    border-bottom: 2px solid var(--primary-light);
+}
+.pw-strength-wrap { margin-top: 8px; }
+.strength-bar-bg { height: 4px; background: var(--gray-border); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+.strength-bar { height: 100%; width: 0; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+.strength-label { font-size: 0.72rem; font-weight: 600; }
+</style>
+
+<div class="register-page">
+    <div class="register-card">
+        <div class="register-header">
+            <div class="rh-icon">🎓</div>
+            <div>
+                <h1>Student Registration</h1>
+                <p>Create your account to access the hostel complaint system</p>
+            </div>
+        </div>
+        <div class="register-body">
+            <form action="/auth/student/register" method="POST" id="registerForm" novalidate>
+
+                <div class="section-divider">Personal Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="full_name">Full Name <span class="required">*</span></label>
+                        <input type="text" id="full_name" name="full_name" class="form-control"
+                               placeholder="e.g. Ravi Kumar" value="<%= formData.full_name || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register_number">Register Number <span class="required">*</span></label>
+                        <input type="text" id="register_number" name="register_number" class="form-control"
+                               placeholder="e.g. 21CS001" value="<%= formData.register_number || '' %>"
+                               required style="text-transform:uppercase"
+                               oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="department">Department <span class="required">*</span></label>
+                        <select id="department" name="department" class="form-control" required>
+                            <option value="">Select Department</option>
+                            <option value="Computer Science" <%= formData.department === 'Computer Science' ? 'selected' : '' %>>Computer Science</option>
+                            <option value="Information Technology" <%= formData.department === 'Information Technology' ? 'selected' : '' %>>Information Technology</option>
+                            <option value="Electronics" <%= formData.department === 'Electronics' ? 'selected' : '' %>>Electronics & Communication</option>
+                            <option value="Mechanical" <%= formData.department === 'Mechanical' ? 'selected' : '' %>>Mechanical Engineering</option>
+                            <option value="Civil" <%= formData.department === 'Civil' ? 'selected' : '' %>>Civil Engineering</option>
+                            <option value="Electrical" <%= formData.department === 'Electrical' ? 'selected' : '' %>>Electrical Engineering</option>
+                            <option value="Chemical" <%= formData.department === 'Chemical' ? 'selected' : '' %>>Chemical Engineering</option>
+                            <option value="Biotechnology" <%= formData.department === 'Biotechnology' ? 'selected' : '' %>>Biotechnology</option>
+                            <option value="MBA" <%= formData.department === 'MBA' ? 'selected' : '' %>>MBA</option>
+                            <option value="MCA" <%= formData.department === 'MCA' ? 'selected' : '' %>>MCA</option>
+                            <option value="Other" <%= formData.department === 'Other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="year_of_study">Year of Study <span class="required">*</span></label>
+                        <select id="year_of_study" name="year_of_study" class="form-control" required>
+                            <option value="">Select Year</option>
+                            <option value="1" <%= formData.year_of_study === '1' ? 'selected' : '' %>>1st Year</option>
+                            <option value="2" <%= formData.year_of_study === '2' ? 'selected' : '' %>>2nd Year</option>
+                            <option value="3" <%= formData.year_of_study === '3' ? 'selected' : '' %>>3rd Year</option>
+                            <option value="4" <%= formData.year_of_study === '4' ? 'selected' : '' %>>4th Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gender <span class="required">*</span></label>
+                    <div class="d-flex gap-3" style="margin-top: 6px;">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                            <input type="radio" name="gender" value="Male" <%= formData.gender === 'Male' ? 'checked' : '' %>> Male
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                            <input type="radio" name="gender" value="Female" <%= formData.gender === 'Female' ? 'checked' : '' %>> Female
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                            <input type="radio" name="gender" value="Other" <%= formData.gender === 'Other' ? 'checked' : '' %>> Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="section-divider">Hostel Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="hostel_block">Hostel Block <span class="required">*</span></label>
+                        <select id="hostel_block" name="hostel_block" class="form-control" required>
+                            <option value="">Select Block</option>
+                            <% ['A','B','C','D','E','F','G','H'].forEach(b => { %>
+                            <option value="Block-<%= b %>" <%= formData.hostel_block === 'Block-'+b ? 'selected' : '' %>>Block <%= b %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="room_number">Room Number <span class="required">*</span></label>
+                        <input type="text" id="room_number" name="room_number" class="form-control"
+                               placeholder="e.g. 101, A-205" value="<%= formData.room_number || '' %>" required>
+                    </div>
+                </div>
+
+                <div class="section-divider">Contact Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" class="form-control"
+                               placeholder="10-digit mobile number" value="<%= formData.phone || '' %>"
+                               maxlength="10" required>
+                        <span class="form-hint">Enter 10-digit mobile number</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" class="form-control"
+                               placeholder="your@email.com" value="<%= formData.email || '' %>" required>
+                    </div>
+                </div>
+
+                <div class="section-divider">Create Password</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password <span class="required">*</span></label>
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control"
+                                   placeholder="Create a strong password" required>
+                            <span class="input-icon-right toggle-password" data-target="password" title="Show password">👁️</span>
+                        </div>
+                        <div class="pw-strength-wrap">
+                            <div class="strength-bar-bg"><div class="strength-bar" id="strengthBar"></div></div>
+                            <span class="strength-label" id="strengthText"></span>
+                        </div>
+                        <span class="form-hint">Min 8 chars with uppercase, lowercase, number & special char</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="confirm_password">Confirm Password <span class="required">*</span></label>
+                        <div class="input-group">
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                   placeholder="Re-enter your password" required>
+                            <span class="input-icon-right toggle-password" data-target="confirm_password" title="Show password">👁️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+                    <button type="submit" class="btn btn-primary btn-lg">✅ Create Account</button>
+                    <a href="/auth/student/login" class="btn btn-outline-gray btn-lg">← Back to Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,186 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Reports'; const pageSubtitle = 'Generate and view complaint reports'; const isAdmin = true; %>
+
+<div class="app-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle, isAdmin }) %>
+        <div class="page-content">
+
+            <!-- Report Filter -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header"><h3>🔍 Generate Report</h3></div>
+                <div class="card-body">
+                    <form method="GET" action="/admin/reports">
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <div class="form-group" style="margin-bottom:0; min-width:160px;">
+                                <label class="form-label">Report Type</label>
+                                <select name="type" class="form-control">
+                                    <option value="all" <%= filters.type==='all'?'selected':'' %>>All Complaints</option>
+                                    <option value="pending" <%= filters.type==='pending'?'selected':'' %>>Pending Only</option>
+                                    <option value="in_progress" <%= filters.type==='in_progress'?'selected':'' %>>In Progress Only</option>
+                                    <option value="resolved" <%= filters.type==='resolved'?'selected':'' %>>Resolved Only</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0; min-width:130px;">
+                                <label class="form-label">Month</label>
+                                <select name="month" class="form-control">
+                                    <option value="">All Months</option>
+                                    <% ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m,i) => { %>
+                                    <option value="<%= i+1 %>" <%= parseInt(filters.month)===i+1?'selected':'' %>><%= m %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0; min-width:110px;">
+                                <label class="form-label">Year</label>
+                                <select name="year" class="form-control">
+                                    <option value="">All Years</option>
+                                    <% const currentYear = new Date().getFullYear(); %>
+                                    <% for(let y = currentYear; y >= currentYear - 3; y--) { %>
+                                    <option value="<%= y %>" <%= parseInt(filters.year)===y?'selected':'' %>><%= y %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button type="submit" class="btn btn-primary">📊 Generate</button>
+                                <a href="/admin/reports" class="btn btn-outline-gray">Reset</a>
+                                <button type="button" class="btn btn-success" onclick="printReport()">🖨️ Print</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Stats Cards -->
+            <div class="stats-grid" style="margin-bottom:20px;">
+                <div class="stat-card">
+                    <div class="stat-icon cyan">📋</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.total || 0 %></div>
+                        <div class="stat-label">Total Complaints</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.pending || 0 %></div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">🔄</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.in_progress || 0 %></div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.resolved || 0 %></div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <% if (byCategory.length > 0) { %>
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header"><h3>📂 Complaints by Category</h3></div>
+                <div class="card-body">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:10px;">
+                        <% byCategory.forEach(cat => { %>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--gray-light); border-radius:8px; border:1px solid var(--gray-border);">
+                            <span style="font-size:0.83rem; font-weight:500; color:var(--dark);"><%= cat.category %></span>
+                            <span class="badge badge-blue"><%= cat.count %></span>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- Report Table -->
+            <div class="card" id="printArea">
+                <div class="report-header">
+                    <h2>
+                        📄 Complaint Report —
+                        <%= filters.type === 'all' ? 'All Complaints' : filters.type === 'pending' ? 'Pending Complaints' : filters.type === 'in_progress' ? 'In Progress' : 'Resolved Complaints' %>
+                    </h2>
+                    <p>
+                        Generated on <%= new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %>
+                        <% if (filters.month && filters.year) { %> &bull; Period: Month <%= filters.month %>, <%= filters.year %><% } %>
+                        &bull; Total Records: <%= complaints.length %>
+                    </p>
+                </div>
+
+                <% if (complaints.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Data Found</h3>
+                    <p>No complaints match the selected report criteria.</p>
+                </div>
+                <% } else { %>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Complaint ID</th>
+                                <th>Student</th>
+                                <th>Reg. No.</th>
+                                <th>Department</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% complaints.forEach((c, i) => {
+                                const sClass = {'Pending':'badge-pending','In Progress':'badge-progress','Resolved':'badge-resolved','Rejected':'badge-rejected'}[c.status]||'badge-gray';
+                                const pClass = {'Low':'badge-low','Medium':'badge-medium','High':'badge-high','Critical':'badge-critical'}[c.priority]||'badge-gray';
+                            %>
+                            <tr>
+                                <td style="color:var(--gray); font-size:0.78rem;"><%= i+1 %></td>
+                                <td><code style="font-size:0.7rem; color:var(--primary);"><%= c.complaint_id %></code></td>
+                                <td style="font-size:0.82rem; font-weight:500;"><%= c.student_name %></td>
+                                <td style="font-size:0.78rem; color:var(--gray);"><%= c.register_number %></td>
+                                <td style="font-size:0.78rem;"><%= c.department %></td>
+                                <td>
+                                    <div style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.82rem;" title="<%= c.title %>">
+                                        <%= c.title %>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-blue" style="font-size:0.7rem;"><%= c.category %></span></td>
+                                <td><span class="badge <%= pClass %>" style="font-size:0.7rem;"><%= c.priority %></span></td>
+                                <td><span class="badge <%= sClass %>" style="font-size:0.7rem;"><%= c.status %></span></td>
+                                <td style="font-size:0.78rem; color:var(--gray); white-space:nowrap;">
+                                    <%= new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <span style="font-size:0.8rem; color:var(--gray);">Total: <strong><%= complaints.length %></strong> record(s)</span>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .sidebar, .topbar, .filter-bar, .stats-grid, .report-header + * { /* keep report table */ }
+    .sidebar, .topbar, .main-content > .page-content > *:not(.card:last-child) { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .card:last-child { box-shadow: none; border: none; }
+}
+</style>
+
+<%- include('../partials/footer') %>

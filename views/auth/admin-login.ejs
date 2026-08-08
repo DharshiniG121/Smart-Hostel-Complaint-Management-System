@@ -1,0 +1,83 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+
+<div class="auth-page" style="background: linear-gradient(135deg, #1e293b 0%, #dc2626 50%, #b45309 100%);">
+    <div class="auth-wrapper">
+        <!-- Left Panel -->
+        <div class="auth-panel" style="background: linear-gradient(160deg, #1e293b, #dc2626);">
+            <div class="panel-icon">🔐</div>
+            <h2>Admin Control Panel</h2>
+            <p>Manage hostel complaints, monitor student issues, and maintain hostel standards efficiently.</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="fi-icon">📊</div>
+                    <span>Full dashboard analytics</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">⚙️</div>
+                    <span>Manage & resolve complaints</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">👥</div>
+                    <span>Student management system</span>
+                </div>
+                <div class="feature-item">
+                    <div class="fi-icon">📈</div>
+                    <span>Generate detailed reports</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Area -->
+        <div class="auth-form-area">
+            <div class="auth-logo">
+                <div class="logo-icon" style="background: #dc2626;">🛡️</div>
+                <div class="logo-text">
+                    <h3>Admin Portal</h3>
+                    <span>Authorized Personnel Only</span>
+                </div>
+            </div>
+
+            <h1>Admin Login</h1>
+            <p class="auth-subtitle">Sign in with your admin credentials</p>
+
+            <form action="/auth/admin/login" method="POST" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="credential">Username or Email <span class="required">*</span></label>
+                    <div class="input-group">
+                        <span class="input-icon">🛡️</span>
+                        <input type="text" id="credential" name="credential" class="form-control"
+                               placeholder="Enter username or email"
+                               value="<%= formData.credential || '' %>" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="adminPassword">Password <span class="required">*</span></label>
+                    <div class="input-group">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="adminPassword" name="password" class="form-control"
+                               placeholder="Enter your password" required autocomplete="current-password">
+                        <span class="input-icon-right toggle-password" data-target="adminPassword">👁️</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-full btn-lg mt-3">
+                    🔑 Sign In as Admin
+                </button>
+            </form>
+
+            <div class="auth-footer-link" style="margin-top: 20px;">
+                <a href="/auth/student/login" style="color: var(--gray); font-size: 0.78rem;">← Student Login</a>
+            </div>
+
+            <div style="margin-top: 24px; padding: 14px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
+                <p style="font-size: 0.78rem; color: #991b1b; font-weight: 500; margin: 0;">
+                    ⚠️ This area is restricted to authorized administrators only. Unauthorized access attempts are logged.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

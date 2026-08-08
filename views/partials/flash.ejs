@@ -1,0 +1,4 @@
+<%# Flash message data element - JS reads this and shows toast %>
+<% if (flash) { %>
+<div id="flash-data" data-type="<%= flash.type %>" data-message="<%= flash.message %>" style="display:none;"></div>
+<% } %>

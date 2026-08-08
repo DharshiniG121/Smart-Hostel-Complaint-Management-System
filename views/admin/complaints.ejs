@@ -1,0 +1,132 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Complaints'; const pageSubtitle = total + ' complaint(s) found'; const isAdmin = true; %>
+
+<div class="app-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle, isAdmin }) %>
+        <div class="page-content">
+
+            <!-- Filter Bar -->
+            <form method="GET" action="/admin/complaints">
+                <div class="filter-bar">
+                    <input type="text" name="search" id="searchInput" class="form-control search-input"
+                           placeholder="🔍 Search by ID, title, student..." value="<%= filters.search %>">
+                    <select name="status" class="form-control" style="max-width:140px;" onchange="this.form.submit()">
+                        <option value="">All Status</option>
+                        <% ['Pending','In Progress','Resolved','Rejected'].forEach(s => { %>
+                        <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+                        <% }) %>
+                    </select>
+                    <select name="category" class="form-control" style="max-width:160px;" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        <% ['Electrical','Plumbing','Internet/WiFi','Furniture','Cleaning','Water Supply','Mess/Food','Security','Others'].forEach(c => { %>
+                        <option value="<%= c %>" <%= filters.category === c ? 'selected' : '' %>><%= c %></option>
+                        <% }) %>
+                    </select>
+                    <select name="priority" class="form-control" style="max-width:140px;" onchange="this.form.submit()">
+                        <option value="">All Priorities</option>
+                        <% ['Low','Medium','High','Critical'].forEach(p => { %>
+                        <option value="<%= p %>" <%= filters.priority === p ? 'selected' : '' %>><%= p %></option>
+                        <% }) %>
+                    </select>
+                    <select name="hostel_block" class="form-control" style="max-width:130px;" onchange="this.form.submit()">
+                        <option value="">All Blocks</option>
+                        <% ['A','B','C','D','E','F','G','H'].forEach(b => { %>
+                        <option value="Block-<%= b %>" <%= filters.hostel_block === 'Block-'+b ? 'selected' : '' %>>Block <%= b %></option>
+                        <% }) %>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="/admin/complaints" class="btn btn-outline-gray">Reset</a>
+                </div>
+            </form>
+
+            <div class="card">
+                <% if (complaints.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Complaints Found</h3>
+                    <p>No complaints match the current filter criteria.</p>
+                    <a href="/admin/complaints" class="btn btn-outline">Clear Filters</a>
+                </div>
+                <% } else { %>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-sort>ID</th>
+                                <th data-sort>Student</th>
+                                <th data-sort>Title</th>
+                                <th data-sort>Category</th>
+                                <th data-sort>Block</th>
+                                <th data-sort>Priority</th>
+                                <th data-sort>Status</th>
+                                <th data-sort>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% complaints.forEach(c => {
+                                const sClass = {'Pending':'badge-pending','In Progress':'badge-progress','Resolved':'badge-resolved','Rejected':'badge-rejected'}[c.status]||'badge-gray';
+                                const pClass = {'Low':'badge-low','Medium':'badge-medium','High':'badge-high','Critical':'badge-critical'}[c.priority]||'badge-gray';
+                            %>
+                            <tr>
+                                <td><code style="font-size:0.7rem;color:var(--primary);"><%= c.complaint_id %></code></td>
+                                <td>
+                                    <div style="font-size:0.82rem; font-weight:500;"><%= c.student_name %></div>
+                                    <div style="font-size:0.72rem; color:var(--gray);"><%= c.register_number %></div>
+                                </td>
+                                <td>
+                                    <div style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.83rem;" title="<%= c.title %>">
+                                        <%= c.title %>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-blue" style="font-size:0.7rem;"><%= c.category %></span></td>
+                                <td style="font-size:0.82rem;"><%= c.hostel_block %></td>
+                                <td><span class="badge <%= pClass %>" style="font-size:0.7rem;"><%= c.priority %></span></td>
+                                <td><span class="badge <%= sClass %>" style="font-size:0.7rem;"><%= c.status %></span></td>
+                                <td style="font-size:0.78rem;color:var(--gray);white-space:nowrap;">
+                                    <%= new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="/admin/complaints/<%= c.id %>" class="btn btn-outline btn-sm">👁</a>
+                                        <form action="/admin/complaints/<%= c.id %>/delete" method="POST"
+                                              class="delete-form" data-confirm="Permanently delete this complaint?">
+                                            <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <% if (totalPages > 1) { %>
+                <div class="card-footer">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <div class="page-info">Page <%= currentPage %> of <%= totalPages %> (<%= total %> total)</div>
+                        <div class="pagination">
+                            <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage-1 %>&search=<%= filters.search %>&status=<%= filters.status %>&category=<%= filters.category %>&priority=<%= filters.priority %>&hostel_block=<%= filters.hostel_block %>" class="page-btn">‹</a>
+                            <% } %>
+                            <% for(let i = Math.max(1,currentPage-2); i <= Math.min(totalPages,currentPage+2); i++) { %>
+                            <a href="?page=<%= i %>&search=<%= filters.search %>&status=<%= filters.status %>&category=<%= filters.category %>&priority=<%= filters.priority %>&hostel_block=<%= filters.hostel_block %>"
+                               class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage+1 %>&search=<%= filters.search %>&status=<%= filters.status %>&category=<%= filters.category %>&priority=<%= filters.priority %>&hostel_block=<%= filters.hostel_block %>" class="page-btn">›</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

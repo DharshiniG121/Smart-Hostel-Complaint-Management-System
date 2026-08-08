@@ -1,0 +1,104 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'New Complaint'; const pageSubtitle = 'Submit a new hostel complaint'; %>
+
+<div class="app-shell">
+    <%- include('../partials/student-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle }) %>
+        <div class="page-content">
+            <div style="max-width: 720px; margin: 0 auto;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📝 Submit New Complaint</h3>
+                        <span class="badge badge-blue">Auto ID will be generated</span>
+                    </div>
+                    <div class="card-body">
+                        <form action="/student/complaints/new" method="POST" novalidate>
+
+                            <div class="form-group">
+                                <label class="form-label" for="title">Complaint Title <span class="required">*</span></label>
+                                <input type="text" id="title" name="title" class="form-control"
+                                       placeholder="Brief title describing the issue"
+                                       value="<%= formData.title || '' %>" required
+                                       data-max-chars="200" data-counter="titleCount">
+                                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                                    <span class="form-hint">Be specific and concise</span>
+                                    <span class="form-hint" id="titleCount">0 / 200</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="category">Category <span class="required">*</span></label>
+                                    <select id="category" name="category" class="form-control" required>
+                                        <option value="">Select Category</option>
+                                        <% ['Electrical','Plumbing','Internet/WiFi','Furniture','Cleaning','Water Supply','Mess/Food','Security','Others'].forEach(cat => { %>
+                                        <option value="<%= cat %>" <%= formData.category === cat ? 'selected' : '' %>><%= cat %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="priority">Priority <span class="required">*</span></label>
+                                    <select id="priority" name="priority" class="form-control" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="Low" <%= formData.priority === 'Low' ? 'selected' : '' %>>🟢 Low</option>
+                                        <option value="Medium" <%= formData.priority === 'Medium' || !formData.priority ? 'selected' : '' %>>🟡 Medium</option>
+                                        <option value="High" <%= formData.priority === 'High' ? 'selected' : '' %>>🟠 High</option>
+                                        <option value="Critical" <%= formData.priority === 'Critical' ? 'selected' : '' %>>🔴 Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="description">Description <span class="required">*</span></label>
+                                <textarea id="description" name="description" class="form-control"
+                                          rows="5" placeholder="Describe your issue in detail (minimum 20 characters)..."
+                                          required data-max-chars="2000" data-counter="descCount"><%= formData.description || '' %></textarea>
+                                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                                    <span class="form-hint">Minimum 20 characters</span>
+                                    <span class="form-hint" id="descCount">0 / 2000</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="hostel_block">Hostel Block <span class="required">*</span></label>
+                                    <select id="hostel_block" name="hostel_block" class="form-control" required>
+                                        <option value="">Select Block</option>
+                                        <% ['A','B','C','D','E','F','G','H'].forEach(b => { %>
+                                        <option value="Block-<%= b %>" <%= formData.hostel_block === 'Block-'+b ? 'selected' : '' %>>Block <%= b %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="room_number">Room Number <span class="required">*</span></label>
+                                    <input type="text" id="room_number" name="room_number" class="form-control"
+                                           placeholder="e.g. 101" value="<%= formData.room_number || '' %>" required>
+                                </div>
+                            </div>
+
+                            <!-- Priority Guide -->
+                            <div style="background: var(--gray-light); border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                                <div style="font-size:0.78rem; font-weight:600; color:var(--dark-secondary); margin-bottom: 8px;">Priority Guide:</div>
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size:0.78rem; color:var(--gray);">
+                                    <div>🟢 <strong>Low</strong> – Minor inconvenience</div>
+                                    <div>🟡 <strong>Medium</strong> – Affects daily routine</div>
+                                    <div>🟠 <strong>High</strong> – Urgent attention needed</div>
+                                    <div>🔴 <strong>Critical</strong> – Safety / emergency issue</div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:12px;">
+                                <button type="submit" class="btn btn-primary btn-lg">📤 Submit Complaint</button>
+                                <a href="/student/complaints" class="btn btn-outline-gray btn-lg">✕ Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,183 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Complaint Details'; const pageSubtitle = complaint.complaint_id; const isAdmin = true; %>
+
+<div class="app-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle, isAdmin }) %>
+        <div class="page-content">
+            <%
+            const sClass = {'Pending':'badge-pending','In Progress':'badge-progress','Resolved':'badge-resolved','Rejected':'badge-rejected'}[complaint.status]||'badge-gray';
+            const pClass = {'Low':'badge-low','Medium':'badge-medium','High':'badge-high','Critical':'badge-critical'}[complaint.priority]||'badge-gray';
+            %>
+
+            <div style="display:grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start;">
+
+                <!-- Main Complaint Info -->
+                <div>
+                    <div class="card" style="margin-bottom: 16px;">
+                        <div class="card-header">
+                            <div>
+                                <div style="font-size:0.73rem; color:var(--gray); font-family:monospace; margin-bottom:4px;"><%= complaint.complaint_id %></div>
+                                <h3 style="font-size:1.05rem;"><%= complaint.title %></h3>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="badge <%= sClass %>"><%= complaint.status %></span>
+                                <span class="badge <%= pClass %>"><%= complaint.priority %></span>
+                            </div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Category</span>
+                                <span class="info-value">📂 <%= complaint.category %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Hostel / Room</span>
+                                <span class="info-value">🏨 <%= complaint.hostel_block %>, Rm <%= complaint.room_number %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Submitted</span>
+                                <span class="info-value">🕒 <%= new Date(complaint.created_at).toLocaleString('en-IN') %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Last Updated</span>
+                                <span class="info-value">🔄 <%= new Date(complaint.updated_at).toLocaleString('en-IN') %></span>
+                            </div>
+                            <% if (complaint.resolved_at) { %>
+                            <div class="info-row">
+                                <span class="info-label">Resolved On</span>
+                                <span class="info-value" style="color:var(--success);">✅ <%= new Date(complaint.resolved_at).toLocaleString('en-IN') %></span>
+                            </div>
+                            <div class="info-row"></div>
+                            <% } %>
+                        </div>
+                        <div class="card-body" style="border-top:1px solid var(--gray-border);">
+                            <div style="font-size:0.75rem; font-weight:600; color:var(--gray); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Description</div>
+                            <p style="font-size:0.88rem; line-height:1.75; color:var(--dark); white-space:pre-wrap;"><%= complaint.description %></p>
+                        </div>
+                    </div>
+
+                    <!-- Student Info -->
+                    <div class="card" style="margin-bottom: 16px;">
+                        <div class="card-header"><h3>👤 Student Information</h3></div>
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Full Name</span>
+                                <span class="info-value"><%= complaint.student_name %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Register No.</span>
+                                <span class="info-value"><%= complaint.register_number %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Department</span>
+                                <span class="info-value"><%= complaint.department %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email</span>
+                                <span class="info-value"><a href="mailto:<%= complaint.student_email %>"><%= complaint.student_email %></a></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value"><%= complaint.student_phone %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Room</span>
+                                <span class="info-value"><%= complaint.hostel_block %>, Room <%= complaint.room_number %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status History -->
+                    <div class="card">
+                        <div class="card-header"><h3>📜 Status History</h3></div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <% history.forEach(h => {
+                                    const dc = {'Pending':'pending','In Progress':'progress','Resolved':'resolved','Rejected':'rejected'}[h.new_status]||'';
+                                    const ic = {'Pending':'⏳','In Progress':'🔄','Resolved':'✅','Rejected':'❌'}[h.new_status]||'📌';
+                                %>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot <%= dc %>"><%= ic %></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">
+                                            <strong><%= h.new_status %></strong>
+                                            <% if(h.old_status){ %><span style="color:var(--gray);font-weight:400;"> ← <%= h.old_status %></span><% } %>
+                                        </div>
+                                        <div class="timeline-time">
+                                            By <%= h.changed_by_name||'System' %> (<%= h.changed_by_type %>) &bull;
+                                            <%= new Date(h.created_at).toLocaleString('en-IN') %>
+                                        </div>
+                                        <% if(h.remarks){ %><div class="timeline-desc">📝 <%= h.remarks %></div><% } %>
+                                    </div>
+                                </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Panel -->
+                <div>
+                    <div class="card">
+                        <div class="card-header"><h3>⚙️ Update Complaint</h3></div>
+                        <div class="card-body">
+                            <form action="/admin/complaints/<%= complaint.id %>/update" method="POST">
+                                <div class="form-group">
+                                    <label class="form-label">Status <span class="required">*</span></label>
+                                    <select name="status" class="form-control" required>
+                                        <% ['Pending','In Progress','Resolved','Rejected'].forEach(s => { %>
+                                        <option value="<%= s %>" <%= complaint.status===s?'selected':'' %>><%= s %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Priority <span class="required">*</span></label>
+                                    <select name="priority" class="form-control" required>
+                                        <% ['Low','Medium','High','Critical'].forEach(p => { %>
+                                        <option value="<%= p %>" <%= complaint.priority===p?'selected':'' %>><%= p %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Assign To</label>
+                                    <select name="assigned_to" class="form-control">
+                                        <option value="">Unassigned</option>
+                                        <% admins.forEach(a => { %>
+                                        <option value="<%= a.id %>" <%= complaint.assigned_to===a.id?'selected':'' %>><%= a.full_name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Admin Remarks</label>
+                                    <textarea name="admin_remarks" class="form-control" rows="4"
+                                              placeholder="Add remarks or resolution notes..."><%= complaint.admin_remarks || '' %></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">💾 Update Complaint</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px; display:flex; flex-direction:column; gap: 8px;">
+                        <a href="/admin/complaints" class="btn btn-outline-gray w-full text-center">← Back to List</a>
+                        <form action="/admin/complaints/<%= complaint.id %>/delete" method="POST"
+                              class="delete-form" data-confirm="Permanently delete this complaint? This cannot be undone.">
+                            <button type="submit" class="btn btn-danger w-full">🗑️ Delete Complaint</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media (max-width: 900px) {
+    .page-content > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<%- include('../partials/footer') %>

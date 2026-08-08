@@ -1,0 +1,152 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'My Profile'; const pageSubtitle = 'Manage your account settings'; %>
+
+<div class="app-shell">
+    <%- include('../partials/student-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle }) %>
+        <div class="page-content">
+            <div style="max-width: 800px; margin: 0 auto;">
+
+                <!-- Profile Header Card -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="profile-card">
+                        <div class="profile-avatar"><%= student.full_name.charAt(0).toUpperCase() %></div>
+                        <div class="profile-info">
+                            <div class="profile-name"><%= student.full_name %></div>
+                            <div class="profile-reg">📛 <%= student.register_number %></div>
+                            <div class="profile-dept">🏛️ <%= student.department %> &bull; Year <%= student.year_of_study %></div>
+                            <div style="margin-top:8px; display:flex; gap:12px; flex-wrap:wrap;">
+                                <span style="font-size:0.78rem; color:var(--gray);">🏨 <%= student.hostel_block %>, Room <%= student.room_number %></span>
+                                <span style="font-size:0.78rem; color:var(--gray);">📱 <%= student.phone %></span>
+                                <span style="font-size:0.78rem; color:var(--gray);">✉️ <%= student.email %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header"><h3>✏️ Edit Profile</h3></div>
+                    <div class="card-body">
+                        <form action="/student/profile/update" method="POST" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name <span class="required">*</span></label>
+                                    <input type="text" name="full_name" class="form-control"
+                                           value="<%= student.full_name %>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Register Number</label>
+                                    <input type="text" class="form-control" value="<%= student.register_number %>" disabled
+                                           style="background:var(--gray-light); cursor:not-allowed;">
+                                    <span class="form-hint">Register number cannot be changed</span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Department <span class="required">*</span></label>
+                                    <select name="department" class="form-control" required>
+                                        <% ['Computer Science','Information Technology','Electronics','Mechanical','Civil','Electrical','Chemical','Biotechnology','MBA','MCA','Other'].forEach(d => { %>
+                                        <option value="<%= d %>" <%= student.department === d ? 'selected' : '' %>><%= d %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Year of Study <span class="required">*</span></label>
+                                    <select name="year_of_study" class="form-control" required>
+                                        <% ['1','2','3','4'].forEach(y => { %>
+                                        <option value="<%= y %>" <%= student.year_of_study === y ? 'selected' : '' %>>Year <%= y %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Gender <span class="required">*</span></label>
+                                    <select name="gender" class="form-control" required>
+                                        <% ['Male','Female','Other'].forEach(g => { %>
+                                        <option value="<%= g %>" <%= student.gender === g ? 'selected' : '' %>><%= g %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number <span class="required">*</span></label>
+                                    <input type="tel" name="phone" id="phone" class="form-control"
+                                           value="<%= student.phone %>" maxlength="10" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Hostel Block <span class="required">*</span></label>
+                                    <select name="hostel_block" class="form-control" required>
+                                        <% ['A','B','C','D','E','F','G','H'].forEach(b => { %>
+                                        <option value="Block-<%= b %>" <%= student.hostel_block === 'Block-'+b ? 'selected' : '' %>>Block <%= b %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Room Number <span class="required">*</span></label>
+                                    <input type="text" name="room_number" class="form-control"
+                                           value="<%= student.room_number %>" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address <span class="required">*</span></label>
+                                <input type="email" name="email" class="form-control"
+                                       value="<%= student.email %>" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="card">
+                    <div class="card-header"><h3>🔒 Change Password</h3></div>
+                    <div class="card-body">
+                        <form action="/student/profile/change-password" method="POST" novalidate>
+                            <div class="form-group">
+                                <label class="form-label">Current Password <span class="required">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" name="current_password" id="current_password" class="form-control"
+                                           placeholder="Enter current password" required>
+                                    <span class="input-icon-right toggle-password" data-target="current_password">👁️</span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">New Password <span class="required">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" name="new_password" id="password" class="form-control"
+                                               placeholder="Enter new password" required>
+                                        <span class="input-icon-right toggle-password" data-target="password">👁️</span>
+                                    </div>
+                                    <div style="margin-top:6px;">
+                                        <div style="height:4px; background:var(--gray-border); border-radius:4px; overflow:hidden; margin-bottom:4px;">
+                                            <div class="strength-bar" id="strengthBar" style="height:100%; width:0; border-radius:4px; transition:all 0.3s;"></div>
+                                        </div>
+                                        <span style="font-size:0.72rem; font-weight:600;" id="strengthText"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password <span class="required">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" name="confirm_new_password" id="confirm_password" class="form-control"
+                                               placeholder="Re-enter new password" required>
+                                        <span class="input-icon-right toggle-password" data-target="confirm_password">👁️</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-warning">🔑 Update Password</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,65 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🔐</div>
+        <div class="brand-text">
+            <h3>Hostel CMS</h3>
+            <span>Admin Panel</span>
+        </div>
+    </div>
+
+    <div class="sidebar-user">
+        <div class="user-info">
+            <div class="user-avatar" style="background: linear-gradient(135deg, #dc2626, #f97316);">
+                <%= admin.full_name.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+                <div class="user-name"><%= admin.full_name %></div>
+                <div class="user-role"><%= admin.role === 'super_admin' ? 'Super Admin' : 'Admin' %></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Overview</div>
+        <div class="nav-item">
+            <a href="/admin/dashboard" class="nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+        </div>
+
+        <div class="nav-section-title">Management</div>
+        <div class="nav-item">
+            <a href="/admin/complaints" class="nav-link <%= currentPath === '/complaints' || currentPath.startsWith('/complaints/') ? 'active' : '' %>">
+                <span class="nav-icon">📋</span> Complaints
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="/admin/students" class="nav-link <%= currentPath === '/students' || currentPath.startsWith('/students/') ? 'active' : '' %>">
+                <span class="nav-icon">👥</span> Students
+            </a>
+        </div>
+
+        <div class="nav-section-title">Analytics</div>
+        <div class="nav-item">
+            <a href="/admin/reports" class="nav-link <%= currentPath === '/reports' ? 'active' : '' %>">
+                <span class="nav-icon">📈</span> Reports
+            </a>
+        </div>
+
+        <div class="nav-section-title">Account</div>
+        <div class="nav-item">
+            <a href="/admin/profile" class="nav-link <%= currentPath === '/profile' ? 'active' : '' %>">
+                <span class="nav-icon">👤</span> Profile
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <form action="/auth/admin/logout" method="POST">
+            <button type="submit" class="logout-btn">
+                <span>🚪</span> Logout
+            </button>
+        </form>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

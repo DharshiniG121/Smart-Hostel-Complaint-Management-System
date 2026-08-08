@@ -1,0 +1,162 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Student Details'; const pageSubtitle = student.full_name; const isAdmin = true; %>
+
+<div class="app-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle, isAdmin }) %>
+        <div class="page-content">
+
+            <div style="display:grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+
+                <!-- Student Info Card -->
+                <div>
+                    <div class="card" style="margin-bottom:16px;">
+                        <div style="padding:28px; text-align:center; border-bottom:1px solid var(--gray-border);">
+                            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0891b2);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:2rem;margin:0 auto 12px;">
+                                <%= student.full_name.charAt(0).toUpperCase() %>
+                            </div>
+                            <h3 style="font-size:1.05rem; color:var(--dark);"><%= student.full_name %></h3>
+                            <p style="font-size:0.8rem; margin-top:4px;"><%= student.register_number %></p>
+                            <span class="badge badge-blue" style="margin-top:8px;"><%= student.department %></span>
+                        </div>
+                        <div class="info-grid" style="grid-template-columns:1fr;">
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Email</span>
+                                <span class="info-value" style="word-break:break-all;"><%= student.email %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value">📱 <%= student.phone %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Year of Study</span>
+                                <span class="info-value">Year <%= student.year_of_study %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Gender</span>
+                                <span class="info-value"><%= student.gender %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Hostel Block</span>
+                                <span class="info-value">🏨 <%= student.hostel_block %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none;">
+                                <span class="info-label">Room Number</span>
+                                <span class="info-value"><%= student.room_number %></span>
+                            </div>
+                            <div class="info-row" style="border-right:none; border-bottom:none;">
+                                <span class="info-label">Registered On</span>
+                                <span class="info-value"><%= new Date(student.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header"><h3>📊 Complaint Stats</h3></div>
+                        <div class="card-body" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                            <div style="text-align:center; padding:12px; background:var(--primary-light); border-radius:8px;">
+                                <div style="font-size:1.4rem; font-weight:700; color:var(--primary);"><%= complaints.length %></div>
+                                <div style="font-size:0.72rem; color:var(--gray);">Total</div>
+                            </div>
+                            <div style="text-align:center; padding:12px; background:#fef9c3; border-radius:8px;">
+                                <div style="font-size:1.4rem; font-weight:700; color:#854d0e;">
+                                    <%= complaints.filter(c=>c.status==='Pending').length %>
+                                </div>
+                                <div style="font-size:0.72rem; color:var(--gray);">Pending</div>
+                            </div>
+                            <div style="text-align:center; padding:12px; background:#dbeafe; border-radius:8px;">
+                                <div style="font-size:1.4rem; font-weight:700; color:#1e40af;">
+                                    <%= complaints.filter(c=>c.status==='In Progress').length %>
+                                </div>
+                                <div style="font-size:0.72rem; color:var(--gray);">In Progress</div>
+                            </div>
+                            <div style="text-align:center; padding:12px; background:var(--success-light); border-radius:8px;">
+                                <div style="font-size:1.4rem; font-weight:700; color:var(--success);">
+                                    <%= complaints.filter(c=>c.status==='Resolved').length %>
+                                </div>
+                                <div style="font-size:0.72rem; color:var(--gray);">Resolved</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <a href="/admin/students" class="btn btn-outline-gray w-full text-center">← Back to Students</a>
+                        <form action="/admin/students/<%= student.id %>/delete" method="POST"
+                              class="delete-form"
+                              data-confirm="Remove this student permanently? All their complaints will also be deleted.">
+                            <button type="submit" class="btn btn-danger w-full">🗑️ Remove Student</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Complaints History -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📋 Complaint History</h3>
+                        <span class="badge badge-blue"><%= complaints.length %> total</span>
+                    </div>
+                    <% if (complaints.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No Complaints</h3>
+                        <p>This student has not submitted any complaints yet.</p>
+                    </div>
+                    <% } else { %>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Complaint ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% complaints.forEach(c => {
+                                    const sClass = {'Pending':'badge-pending','In Progress':'badge-progress','Resolved':'badge-resolved','Rejected':'badge-rejected'}[c.status]||'badge-gray';
+                                    const pClass = {'Low':'badge-low','Medium':'badge-medium','High':'badge-high','Critical':'badge-critical'}[c.priority]||'badge-gray';
+                                %>
+                                <tr>
+                                    <td><code style="font-size:0.7rem;color:var(--primary);"><%= c.complaint_id %></code></td>
+                                    <td>
+                                        <div style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.83rem;" title="<%= c.title %>">
+                                            <%= c.title %>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-blue" style="font-size:0.7rem;"><%= c.category %></span></td>
+                                    <td><span class="badge <%= pClass %>" style="font-size:0.7rem;"><%= c.priority %></span></td>
+                                    <td><span class="badge <%= sClass %>" style="font-size:0.7rem;"><%= c.status %></span></td>
+                                    <td style="font-size:0.78rem;color:var(--gray);white-space:nowrap;">
+                                        <%= new Date(c.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/complaints/<%= c.id %>" class="btn btn-outline btn-sm">👁 View</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media (max-width: 900px) {
+    .page-content > div[style*="grid-template-columns: 340px"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<%- include('../partials/footer') %>

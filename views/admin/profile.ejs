@@ -1,0 +1,124 @@
+<%- include('../partials/head') %>
+<%- include('../partials/flash') %>
+<% const pageTitle = 'Admin Profile'; const pageSubtitle = 'Manage your admin account'; const isAdmin = true; %>
+
+<div class="app-shell">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="main-content">
+        <%- include('../partials/topbar', { pageTitle, pageSubtitle, isAdmin }) %>
+        <div class="page-content">
+            <div style="max-width: 700px; margin: 0 auto;">
+
+                <!-- Profile Header Card -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="profile-card">
+                        <div class="profile-avatar" style="background: linear-gradient(135deg, #dc2626, #f97316);">
+                            <%= admin.full_name.charAt(0).toUpperCase() %>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name"><%= admin.full_name %></div>
+                            <div class="profile-reg">🛡️ @<%= admin.username %></div>
+                            <div class="profile-dept" style="color: #dc2626;">
+                                <%= admin.role === 'super_admin' ? '⭐ Super Administrator' : '👔 Administrator' %>
+                            </div>
+                            <div style="margin-top: 8px; display:flex; gap:12px; flex-wrap:wrap;">
+                                <span style="font-size:0.78rem; color:var(--gray);">✉️ <%= admin.email %></span>
+                                <% if (admin.phone) { %>
+                                <span style="font-size:0.78rem; color:var(--gray);">📱 <%= admin.phone %></span>
+                                <% } %>
+                            </div>
+                            <% if (admin.last_login) { %>
+                            <div style="margin-top:4px; font-size:0.75rem; color:var(--gray);">
+                                🕒 Last login: <%= new Date(admin.last_login).toLocaleString('en-IN') %>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Info (read-only) -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header"><h3>📋 Account Information</h3></div>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value"><%= admin.full_name %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Username</span>
+                            <span class="info-value"><%= admin.username %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email Address</span>
+                            <span class="info-value"><%= admin.email %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Role</span>
+                            <span class="info-value">
+                                <span class="badge" style="background:#fee2e2; color:#991b1b;">
+                                    <%= admin.role === 'super_admin' ? 'Super Admin' : 'Admin' %>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Account Created</span>
+                            <span class="info-value"><%= new Date(admin.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Last Login</span>
+                            <span class="info-value">
+                                <%= admin.last_login ? new Date(admin.last_login).toLocaleString('en-IN') : 'N/A' %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="card">
+                    <div class="card-header"><h3>🔒 Change Password</h3></div>
+                    <div class="card-body">
+                        <form action="/admin/profile/change-password" method="POST" novalidate>
+                            <div class="form-group">
+                                <label class="form-label">Current Password <span class="required">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" name="current_password" id="current_password"
+                                           class="form-control" placeholder="Enter current password" required>
+                                    <span class="input-icon-right toggle-password" data-target="current_password">👁️</span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">New Password <span class="required">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" name="new_password" id="password"
+                                               class="form-control" placeholder="New password" required>
+                                        <span class="input-icon-right toggle-password" data-target="password">👁️</span>
+                                    </div>
+                                    <div style="margin-top:6px;">
+                                        <div style="height:4px; background:var(--gray-border); border-radius:4px; overflow:hidden; margin-bottom:4px;">
+                                            <div id="strengthBar" style="height:100%; width:0; border-radius:4px; transition:all 0.3s;"></div>
+                                        </div>
+                                        <span style="font-size:0.72rem; font-weight:600;" id="strengthText"></span>
+                                    </div>
+                                    <span class="form-hint">Min 8 chars, uppercase, lowercase, number & special char</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password <span class="required">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" name="confirm_new_password" id="confirm_password"
+                                               class="form-control" placeholder="Re-enter new password" required>
+                                        <span class="input-icon-right toggle-password" data-target="confirm_password">👁️</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-warning">🔑 Update Password</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
